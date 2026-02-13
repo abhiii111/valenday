@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Infinite Universe</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap');
+
+:root {
+--neon-pink: #ff2d75;
+--deep-purple: #0f001a;
+--black: #050505;
+--glass: rgba(255, 255, 255, 0.07);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { 
+background-color: var(--black); 
+color: white; 
+font-family: 'Poppins', sans-serif; 
+overflow: hidden; 
+height: 100vh;
+touch-action: manipulation;
+}
+
+/* --- COSMIC BACKGROUND --- */
+#starfield {
+position: fixed;
+top: 0; left: 0; z-index: -1;
+background: radial-gradient(circle at center, var(--deep-purple) 0%, var(--black) 100%);
+}
+
+#glow {
+position: fixed;
+width: 600px; height: 600px;
+background: radial-gradient(circle, rgba(255, 45, 117, 0.15) 0%, transparent 70%);
+border-radius: 50%;
+pointer-events: none;
+transform: translate(-50%, -50%);
+z-index: 0;
+}
+
+.petal {
+position: fixed;
+top: -50px;
+z-index: 100;
+user-select: none;
+pointer-events: none;
+animation: fall 5s linear forwards;
+}
+
+@keyframes fall {
+to { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
+
+/* --- PAGES --- */
+.page {
+position: absolute;
+width: 100%; height: 100%;
+display: flex; flex-direction: column;
+justify-content: center; align-items: center;
+transition: all 1s cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+#page2 { display: none; opacity: 0; overflow-y: auto; padding-top: 100px; }
+
+/* --- PAGE 1 UI --- */
+h1.main-q {
+font-family: 'Dancing Script', cursive;
+font-size: 5rem;
+background: linear-gradient(to right, #fff, var(--neon-pink));
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+filter: drop-shadow(0 0 15px var(--neon-pink));
+text-align: center;
+}
+
+.btn-wrap { position: relative; width: 350px; height: 100px; margin-top: 30px; }
+.btn {
+padding: 18px 45px; font-size: 1.3rem; border: 2px solid var(--neon-pink);
+background: transparent; color: white; border-radius: 50px; cursor: pointer;
+transition: 0.3s; position: absolute; font-weight: bold;
+}
+#yesBtn { left: 0; background: var(--neon-pink); box-shadow: 0 0 30px var(--neon-pink); }
+#noBtn { right: 0; }
+
+/* --- PAGE 2 UI --- */
+.container {
+max-width: 800px; width: 90%;
+background: var(--glass);
+backdrop-filter: blur(25px);
+border: 1px solid rgba(255,255,255,0.1);
+border-radius: 40px; padding: 60px;
+text-align: center; margin-bottom: 100px;
+}
+
+.polaroid {
+width: 280px; height: 350px;
+background: white; padding: 15px 15px 60px 15px;
+box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+margin: -120px auto 50px;
+transform: rotate(-3deg);
+transition: 0.4s;
+}
+.polaroid:hover { transform: rotate(0deg) scale(1.05); }
+.polaroid img { width: 100%; height: 100%; object-fit: cover; background: #222; }
+
+.timer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 30px 0; }
+.unit { background: rgba(255,45,117,0.15); padding: 15px; border-radius: 12px; border: 1px solid var(--neon-pink); }
+.num { font-size: 1.8rem; font-weight: bold; color: var(--neon-pink); display: block; }
+
+.scratch-box {
+width: 300px; height: 300px;
+margin: 40px auto;
+position: relative;
+border: 3px solid var(--neon-pink);
+cursor: crosshair;
+background: #111;
+border-radius: 10px;
+overflow: hidden;
+}
+#scratch-canvas { position: absolute; top: 0; left: 0; z-index: 2; }
+#secret-img { width: 100%; height: 100%; object-fit: cover; }
+
+.big-letter {
+font-size: 1.2rem; line-height: 2.2; text-align: justify;
+color: #efefef; margin-top: 40px;
+}
+</style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+<div id="glow"></div>
+
+<audio id="music" loop>
+<source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<div id="page1" class="page">
+<h1 class="main-q">Will you be my Valentine?</h1>
+<div class="btn-wrap">
+<button class="btn" id="yesBtn">YES</button>
+<button class="btn" id="noBtn">No</button>
+</div>
+</div>
+
+<div id="page2" class="page">
+<div class="container">
+<div class="polaroid">
+<img src="main.jpg" alt="Our Photo">
+<p style="color: #333; font-family: 'Dancing Script'; margin-top: 10px; font-size: 1.5rem;">Our Story 📸</p>
+</div>
+
+<h2 style="font-family: 'Dancing Script'; font-size: 3.5rem; color: var(--neon-pink);">March 25, 2021</h2>
+
+<div class="timer-grid">
+<div class="unit"><span class="num" id="d">0</span> Days</div>
+<div class="unit"><span class="num" id="h">0</span> Hrs</div>
+<div class="unit"><span class="num" id="m">0</span> Mins</div>
+<div class="unit"><span class="num" id="s">0</span> Secs</div>
+</div>
+
+<h3 style="margin-top: 50px; letter-spacing: 2px;">Scratch to Reveal... 🔍</h3>
+<div class="scratch-box">
+<canvas id="scratch-canvas"></canvas>
+<img src="secret.jpg" id="secret-img" alt="Secret Photo">
+</div>
+
+<div class="big-letter">
+<p>
+My Dearest, <br><br>
+Since <b>March 25, 2021</b>, my world has been infinitely brighter. You aren't just my partner; you are my best friend, my peace, and my greatest motivator. 
+I love the way we’ve grown together—how we’ve handled the highs and lows, and how your smile still gives me butterflies after all this time. <br><br>
+Whether we're talking for hours or just sitting in comfortable silence, my heart is always at its happiest when I'm with you. 
+Thank you for being you, for your beautiful heart, and for saying yes.
+</p>
+<h2 style="color: var(--neon-pink); font-family: 'Dancing Script'; margin-top: 40px; font-size: 3.5rem;">Always yours.</h2>
+</div>
+</div>
+</div>
+
+<script>
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const yesBtn = document.getElementById('yesBtn');
+const noBtn = document.getElementById('noBtn');
+const p1 = document.getElementById('page1');
+const p2 = document.getElementById('page2');
+const song = document.getElementById('music');
+
+function triggerHaptics() {
+if ("vibrate" in navigator) navigator.vibrate([100, 30, 200]);
+const osc = audioCtx.createOscillator();
+const gain = audioCtx.createGain();
+osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.5);
+gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
+osc.connect(gain); gain.connect(audioCtx.destination);
+osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+}
+
+document.addEventListener('mousemove', e => {
+const glow = document.getElementById('glow');
+glow.style.left = e.clientX + 'px';
+glow.style.top = e.clientY + 'px';
+});
+
+noBtn.onmouseover = () => {
+noBtn.style.position = 'fixed';
+noBtn.style.left = Math.random() * 80 + 'vw';
+noBtn.style.top = Math.random() * 80 + 'vh';
+};
+
+yesBtn.onclick = () => {
+if (audioCtx.state === 'suspended') audioCtx.resume();
+triggerHaptics();
+song.play();
+
+p1.style.opacity = '0';
+p1.style.transform = 'scale(0.8)';
+
+setTimeout(() => {
+p1.style.display = 'none';
+p2.style.display = 'flex';
+p2.style.opacity = '1';
+document.body.style.overflowY = 'auto';
+initScratch();
+startPetals();
+}, 1000);
+};
+
+const start = new Date("March 25, 2021 00:00:00").getTime();
+setInterval(() => {
+const diff = new Date().getTime() - start;
+document.getElementById('d').innerText = Math.floor(diff / 86400000);
+document.getElementById('h').innerText = Math.floor((diff % 86400000) / 3600000);
+document.getElementById('m').innerText = Math.floor((diff % 3600000) / 60000);
+document.getElementById('s').innerText = Math.floor((diff % 60000) / 1000);
+}, 1000);
+
+function initScratch() {
+const cvs = document.getElementById('scratch-canvas');
+const ctx = cvs.getContext('2d');
+cvs.width = 300; cvs.height = 300;
+ctx.fillStyle = '#333'; ctx.fillRect(0,0,300,300);
+ctx.fillStyle = '#ff2d75'; ctx.font = "bold 20px Poppins"; ctx.textAlign = "center";
+ctx.fillText("SCRATCH ME ❤️", 150, 155);
+
+let painting = false;
+const scratch = (e) => {
+if(!painting) return;
+const r = cvs.getBoundingClientRect();
+const x = (e.clientX || (e.touches ? e.touches[0].clientX : 0)) - r.left;
+const y = (e.clientY || (e.touches ? e.touches[0].clientY : 0)) - r.top;
+ctx.globalCompositeOperation = 'destination-out';
+ctx.beginPath(); ctx.arc(x, y, 35, 0, Math.PI*2); ctx.fill();
+}
+['mousedown', 'touchstart'].forEach(evt => cvs.addEventListener(evt, () => painting = true));
+['mouseup', 'touchend'].forEach(evt => cvs.addEventListener(evt, () => painting = false));
+['mousemove', 'touchmove'].forEach(evt => cvs.addEventListener(evt, scratch));
+}
+
+function startPetals() {
+const icons = ['🌸', '🌹', '💖', '✨'];
+setInterval(() => {
+const p = document.createElement('div');
+p.className = 'petal';
+p.innerText = icons[Math.floor(Math.random()*icons.length)];
+p.style.left = Math.random() * 100 + 'vw';
+p.style.fontSize = (Math.random() * 20 + 15) + 'px';
+document.body.appendChild(p);
+setTimeout(() => p.remove(), 5000);
+}, 350);
+}
+
+const canvas = document.getElementById('starfield');
+const c = canvas.getContext('2d');
+window.onresize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+window.onresize();
+let stars = Array(150).fill().map(() => ({x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*1.2}));
+function animate() {
+c.clearRect(0,0,canvas.width,canvas.height); c.fillStyle = "white";
+stars.forEach(s => { c.beginPath(); c.arc(s.x, s.y, s.r, 0, 7); c.fill(); s.y -= 0.4; if(s.y<0) s.y=canvas.height; });
+requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>
